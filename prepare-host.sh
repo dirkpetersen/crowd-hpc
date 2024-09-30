@@ -166,6 +166,7 @@ function main {
   setup_network_bridges
   configure_qemu_bridge_helper
   echo "Setup completed successfully."
+  virsh net-list
 }
 
 # Execute the main function

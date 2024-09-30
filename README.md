@@ -1,51 +1,27 @@
 # crowd-hpc
 Evaluation of a collaborative HPC/AI stack
 
-## Prepare a machine with virtual box and user account
+## Prepare host machine (hypervisor) and user account
 
 * first get a (virtual) machine with at least 8GB and some disk space
-* install virtual box or KVM
 
-For Debian/Ubuntu KVM run:
-
-```
-sudo apt install -y qemu-system-x86 libvirt-daemon-system libvirt-clients bridge-utils virtinst virtualbmc
-# (optional) sudo apt install -y prometheus-libvirt-exporter python3-libvirt python3-virtualbmc
-```
-
-and for RHEL9/Rocky9 run 
+* Run this script as sudo/root user to install packages and configure networking
 
 ```
-sudo dnf install -y qemu-kvm libvirt virt-install bridge-utils
+curl https://raw.githubusercontent.com/dirkpetersen/crowd-hpc/refs/heads/main/prepare-host.sh | sudo bash
 ```
 
-this service is needed for user mode networking
+* Run this script to create a new system user with the right permissions to create VMs (chpc in our case)
 
 ```
-sudo systemctl enable libvirtd.service
-sudo systemctl restart libvirtd.service
+curl https://raw.githubusercontent.com/dirkpetersen/crowd-hpc/refs/heads/main/prepare-user.sh | sudo bash
 ```
 
-create an new system user account that holds the virtual machines, here this is username `chpc`. Note: On RHEL it would be `usermod -aG libvirtd,kvm` instead
-
-```
-sudo bash -c 'NEWUSER=chpc && useradd -rm --shell /bin/bash $NEWUSER && loginctl enable-linger $NEWUSER && usermod -aG libvirt,kvm $NEWUSER && su - $NEWUSER'
-```
-
-**from now on we run every command as user chpc**
-
-make sure that systemctl --user and virsh user mode will work in that account:
-
-```
-echo 'export DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS:-unix:path=/run/user/$(id -u)/bus}' >> ~/.bashrc
-echo 'export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}' >> ~/.bashrc
-echo 'alias virsh="virsh --connect qemu:///session"' >> ~/.bashrc
-source ~/.bashrc
-```
+**from now on we run every command as user, e.g. chpc**
 
 ## Clone Repository 
 
-Now you need to decide if you might want to contribute back to `crowd-hpc` or not. 
+Now you need to decide if you might want to contribute back to `crowd-hpc` on Github or not. 
 
 ### Contribute back (later)
 
@@ -83,7 +59,15 @@ The first step is to install a standard KVM cluster. By default we have one gate
 ./install-kvm-cluster.sh
 ```
 
+if there are no error messages you should be able see this list of nodes
 
 ```
-virsh 
+ $ virsh list --all
+
+ Id   Name            State
+-------------------------------
+ 1    control-node    running
+ 2    worker-node-1   running
+ 3    worker-node-2   running
+ 4    worker-node-3   running
 ```

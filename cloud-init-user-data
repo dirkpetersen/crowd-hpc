@@ -1,0 +1,29 @@
+#cloud-config
+# Enable console output over serial
+output:
+  all: "| tee -a /var/log/cloud-init-output.log"
+
+# Enable serial console on ttyS0 and ensure acpid and serial-getty are started early
+bootcmd:
+  - sed -i '/^GRUB_CMDLINE_LINUX=/ s/"$/ console=ttyS0,115200n8"/' /etc/default/grub
+  - grub2-mkconfig -o /boot/grub2/grub.cfg
+
+# Ensure the cloud-init log is visible via the console and services are started after boot
+runcmd:
+  - systemctl enable acpid
+  - systemctl start acpid
+  - systemctl enable serial-getty@ttyS0.service
+  - systemctl start serial-getty@ttyS0.service
+  - echo "cloud-init has finished configuring the instance" > /dev/ttyS0
+  - cd /root && git clone https://github.com/dirkpetersen/crowd-hpc && cd crowd-hpc && ./install-warewulf.sh
+
+packages:
+  - acpid
+
+chpasswd:
+  list: |
+    rocky:rocky
+  expire: False
+
+# Enable password authentication for SSH
+#ssh_pwauth: True

@@ -32,7 +32,7 @@ create_control_node() {
   echo "Creating control node: ${CONTROL_VM}"
 
   # Check if the file is an ISO or QCOW2
-  echo "Image is ${LOCAL_IMAGE_PATH##*.}, ${LOCAL_IMAGE_PATH##*.} == iso ? creating fresh disk : using directly."
+  echo "Image is ${LOCAL_IMAGE_PATH##*.}, ${LOCAL_IMAGE_PATH##*.} == iso ? creating fresh disk : copy qcow2."
 
   [[ "${LOCAL_IMAGE_PATH}" == *.iso ]] && {
   qemu-img create -f qcow2 "$HOME/kvm-images/${CONTROL_VM}.qcow2" ${CONTROL_DISK_SIZE}M

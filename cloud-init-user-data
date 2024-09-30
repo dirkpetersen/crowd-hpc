@@ -15,10 +15,13 @@ runcmd:
   - systemctl enable serial-getty@ttyS0.service
   - systemctl start serial-getty@ttyS0.service
   - echo "cloud-init has finished configuring the instance" > /dev/ttyS0
-  - cd /root && git clone https://github.com/dirkpetersen/crowd-hpc && cd crowd-hpc && ./install-warewulf.sh
+  - cd /root && git clone https://github.com/dirkpetersen/crowd-hpc && cd crowd-hpc && ./install-warewulf.sh &
 
 packages:
   - acpid
+  - vim
+  - git
+  - python3-devel
 
 chpasswd:
   list: |

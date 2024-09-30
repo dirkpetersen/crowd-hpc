@@ -58,9 +58,6 @@ create_control_node() {
               ${ISO_OPTS}
 
   echo "Control node created and booting (console output suppressed)."
-
-  # Update the graphics to curses mode
-  edit_vm_graphics_to_curses "${CONTROL_VM}"
 }
 
 # Function to create worker nodes using KVM in user-session mode
@@ -90,8 +87,6 @@ create_worker_nodes() {
 
     echo "Worker node ${vm_name} created and set to boot via PXE (console output suppressed)."
 
-    # Update the graphics to curses mode
-    edit_vm_graphics_to_curses "${vm_name}"
   done
 }
 

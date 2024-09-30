@@ -2,6 +2,7 @@
 
 # Base directory where resources are stored
 BASE_DIR="$HOME"
+PRIVATE_NET_NAME="pxe-network"
 
 # Function to delete all KVM virtual machines in user-session mode
 delete_kvm_vms() {
@@ -16,7 +17,7 @@ delete_kvm_vms() {
     for vm in ${vm_list}; do
       if [[ -n "${vm}" ]]; then
         echo "Shutting down and deleting VM: ${vm}"
-        
+
         # Attempt to shutdown the VM gracefully, ignore errors if already shut down
         virsh --connect qemu:///session destroy "${vm}" 2>/dev/null || echo "VM ${vm} is already stopped or failed to stop."
 
@@ -53,11 +54,26 @@ delete_kvm_files() {
   fi
 }
 
+# Function to delete the PXE network
+delete_pxe_network() {
+  echo "Deleting PXE network (${PRIVATE_NET_NAME})..."
+
+  # Check if the network exists
+  if virsh --connect qemu:///session net-info ${PRIVATE_NET_NAME} &>/dev/null; then
+    virsh --connect qemu:///session net-destroy ${PRIVATE_NET_NAME}
+    virsh --connect qemu:///session net-undefine ${PRIVATE_NET_NAME}
+    echo "PXE network ${PRIVATE_NET_NAME} has been deleted."
+  else
+    echo "PXE network ${PRIVATE_NET_NAME} not found."
+  fi
+}
+
 # Main cleanup function
 delete_all_resources() {
   delete_kvm_vms
   delete_kvm_files
-  echo "All KVM resources in user session cleaned up."
+  delete_pxe_network
+  echo "All KVM resources and PXE network in user session cleaned up."
 }
 
 # Execute the cleanup

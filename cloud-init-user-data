@@ -21,7 +21,6 @@ packages:
   - acpid
   - vim
   - git
-  - python3-devel
 
 chpasswd:
   list: |

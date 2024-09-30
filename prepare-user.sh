@@ -43,20 +43,13 @@ create_or_modify_user() {
     exit 1
   fi
 
-  echo "Switching to user ${NEWUSER}..."
-  su - ${NEWUSER} -c "bash -c 'setup_user_env'"
-}
-
-# Function to setup environment for the user
-setup_user_env() {
-  echo "Configuring environment for user ${NEWUSER}..."
-
-  echo 'export DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS:-unix:path=/run/user/$(id -u)/bus}' >> ~/.bashrc
-  echo 'export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}' >> ~/.bashrc
-  echo 'alias virsh="virsh --connect qemu:///session"' >> ~/.bashrc
-
-  echo "Reloading environment variables..."
-  source ~/.bashrc
+  echo "Switching to user ${NEWUSER} to configure environment..."
+  su - ${NEWUSER} -c "bash -c '
+    echo \"export DBUS_SESSION_BUS_ADDRESS=\${DBUS_SESSION_BUS_ADDRESS:-unix:path=/run/user/\$(id -u)/bus}\" >> ~/.bashrc
+    echo \"export XDG_RUNTIME_DIR=\${XDG_RUNTIME_DIR:-/run/user/\$(id -u)}\" >> ~/.bashrc
+    echo \"alias virsh=\\\"virsh --connect qemu:///session\\\"\" >> ~/.bashrc
+    source ~/.bashrc
+  '"
 }
 
 # Main execution

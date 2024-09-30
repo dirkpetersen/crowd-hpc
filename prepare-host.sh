@@ -107,8 +107,6 @@ function check_bridge_exists {
 
 # Ensure /etc/qemu/bridge.conf exists with correct permissions and ownership
 function configure_qemu_bridge_helper {
-  echo "Configuring /etc/qemu/bridge.conf..."
-
   # Create the directory if it doesn't exist
   if [[ ! -d /etc/qemu ]]; then
     mkdir -p /etc/qemu
@@ -132,6 +130,11 @@ function configure_qemu_bridge_helper {
   chmod 644 /etc/qemu/bridge.conf
 
   echo "/etc/qemu/bridge.conf has been configured."
+
+  # Set setuid on qemu-bridge-helper
+  echo "Setting setuid on /usr/lib/qemu/qemu-bridge-helper..."  
+  chmod u+s /usr/lib/qemu/qemu-bridge-helper
+
 }
 
 # Setup the network bridges

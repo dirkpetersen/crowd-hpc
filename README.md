@@ -1,5 +1,5 @@
 # crowd-hpc
-Evaluation of a collaborative HPC/AI stack
+Evaluation of a collaborative HPC/AI stack in a KVM testbed 
 
 ## Prepare host machine (hypervisor) and user account
 
@@ -8,13 +8,13 @@ Evaluation of a collaborative HPC/AI stack
 * Run this script as sudo/root user to install packages and configure networking
 
 ```
-curl https://raw.githubusercontent.com/dirkpetersen/crowd-hpc/refs/heads/main/prepare-host.sh | sudo bash
+curl https://raw.githubusercontent.com/dirkpetersen/crowd-hpc/refs/heads/main/prepare-host.sh?token=$(date +%s) | sudo bash
 ```
 
 * Run this script as sudo/root  to create a new system user with the right permissions to create VMs (chpc in this case)
 
 ```
-curl -s https://raw.githubusercontent.com/dirkpetersen/crowd-hpc/refs/heads/main/prepare-user.sh | sudo bash -s -- chpc
+curl -s https://raw.githubusercontent.com/dirkpetersen/crowd-hpc/refs/heads/main/prepare-user.sh?token=$(date +%s) | sudo bash -s -- chpc
 ```
 
 **from now on we run every command as user, e.g. chpc**
@@ -71,3 +71,5 @@ if there are no error messages you should be able see this list of nodes
  3    worker-node-2   running
  4    worker-node-3   running
 ```
+
+## deploy KVM cluster 

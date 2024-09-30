@@ -43,7 +43,7 @@ create_or_modify_user() {
     exit 1
   fi
 
-  echo "Switching to user ${NEWUSER} to configure environment..."
+  echo "Configure environment for ${NEWUSER} ..."
   su - ${NEWUSER} -c "bash -c '
     echo \"export DBUS_SESSION_BUS_ADDRESS=\${DBUS_SESSION_BUS_ADDRESS:-unix:path=/run/user/\$(id -u)/bus}\" >> ~/.bashrc
     echo \"export XDG_RUNTIME_DIR=\${XDG_RUNTIME_DIR:-/run/user/\$(id -u)}\" >> ~/.bashrc

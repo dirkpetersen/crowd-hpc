@@ -122,6 +122,7 @@ create_environment() {
   check_and_download_image
   create_control_node
   create_worker_nodes
+  echo "Run: virsh console control-node"
 }
 
 # Execute script

@@ -50,6 +50,7 @@ create_or_modify_user() {
     echo \"alias virsh=\\\"virsh --connect qemu:///session\\\"\" >> ~/.bashrc
     source ~/.bashrc
   '"
+  su - olaola
 }
 
 # Main execution

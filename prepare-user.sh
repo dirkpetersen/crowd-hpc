@@ -50,7 +50,7 @@ create_or_modify_user() {
     echo \"alias virsh=\\\"virsh --connect qemu:///session\\\"\" >> ~/.bashrc
     source ~/.bashrc
   '"
-  su - ${NEWUSER}
+  echo "Enter: sudo su - ${NEWUSER}"
 }
 
 # Main execution

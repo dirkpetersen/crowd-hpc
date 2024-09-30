@@ -3,7 +3,7 @@ Evaluation of a collaborative HPC/AI stack
 
 ## Prepare host machine (hypervisor) and user account
 
-* first get a (virtual) machine with at least 8GB and some disk space
+* first get a (virtual) machine with at least 8GB memory and a good amount of disk space under /home
 
 * Run this script as sudo/root user to install packages and configure networking
 
@@ -11,19 +11,19 @@ Evaluation of a collaborative HPC/AI stack
 curl https://raw.githubusercontent.com/dirkpetersen/crowd-hpc/refs/heads/main/prepare-host.sh | sudo bash
 ```
 
-* Run this script to create a new system user with the right permissions to create VMs (chpc in our case)
+* Run this script as sudo/root  to create a new system user with the right permissions to create VMs (chpc in this case)
 
 ```
-curl https://raw.githubusercontent.com/dirkpetersen/crowd-hpc/refs/heads/main/prepare-user.sh | sudo bash
+curl -s https://raw.githubusercontent.com/dirkpetersen/crowd-hpc/refs/heads/main/prepare-user.sh | sudo bash -s -- chpc
 ```
 
 **from now on we run every command as user, e.g. chpc**
 
 ## Clone Repository 
 
-Now you need to decide if you might want to contribute back to `crowd-hpc` on Github or not. 
+Please decide if you might want to contribute back to `crowd-hpc` on Github 
 
-### Contribute back (later)
+### Contribute back (now or later)
 
 if you would like to contribute changes back to crowd-hpc via pull request nor or later do this : 
 

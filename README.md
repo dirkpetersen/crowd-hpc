@@ -14,12 +14,12 @@ sudo apt install -y qemu-system-x86 libvirt-daemon-system libvirt-clients bridge
 
 ```
 
-For Debian/Ubuntu VirtualBox run:
+and for RHEL9/Rocky9 run 
 
 ```
-sudo apt install -y virtualbox virtualbox-ext-pack
+sudo dnf install -y qemu-kvm libvirt virt-install bridge-utils
 ```
-(Note, that for vbox you need to add new users to the `vboxusers` group instead of `libvirt,kvm`)
+
 
 create an new system user account that holds the virtual machines, here this is username `chpc`
 
@@ -42,7 +42,7 @@ echo 'export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}' >> ~/.bashr
 
 ### Contribute back 
 
-if you would like to contribute changes back to crowd-hpc via pull request do this : 
+if you would like to contribute changes back to crowd-hpc via pull request nor or later do this : 
 
 - Fork the repos from: https://github.com/dirkpetersen/crowd-hpc/fork 
 - add the public key from your VS-code machine to ~/.ssh/authorized_keys
@@ -61,7 +61,7 @@ If you make changes to the code you can commit to your fork (e.g. git add * ; gi
 
 ### just install - don't contribute 
 
-if you don't want to contribute back, simply run this : 
+if you never want to contribute back, simply run this : 
 
 ```
 git clone https://github.com/dirkpetersen/crowd-hpc.git

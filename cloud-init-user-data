@@ -14,7 +14,8 @@ bootcmd:
   - sed -i '/^GRUB_CMDLINE_LINUX=/ s/"$/ console=ttyS0,115200n8"/' /etc/default/grub
   - grub2-mkconfig -o /boot/grub2/grub.cfg
   - mkdir -p /etc/systemd/system/NetworkManager-wait-online.service.d/
-  - echo -e "[Service]\nTimeoutStartSec=5" > /etc/systemd/system/NetworkManager-wait-online.service.d/override.conf
+  - echo -e "[Service]\nExecStart=/usr/lib/systemd/systemd-networkd-wait-online --any" > /etc/systemd/system/NetworkManager-wait-online.service.d/override.conf
+  - systemctl daemon-reload
 
 # Ensure the cloud-init log is visible via the console and services are started after boot
 runcmd:

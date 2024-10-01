@@ -1,5 +1,7 @@
 ## support-functions.sh
 
+# functions that are sourced by other scripts. 
+
 # Function to detect if running on KVM and check for nested virtualization support
 check_kvm_and_nested() {
   if [[ ! -d /sys/module/kvm ]]; then

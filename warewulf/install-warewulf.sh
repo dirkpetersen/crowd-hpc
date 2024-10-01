@@ -20,4 +20,13 @@ fi
 
 # Install the RPM using sudo dnf
 echo "Installing ${rpm_url}..."
-sudo dnf install -y "${rpm_url}"
+dnf install -y "${rpm_url}"
+
+# Install other required packages 
+dnf install -y ca-certificates dnsmasq chrony
+
+# disabled dhcpd and tftp in  dnsmasq
+systemctl disable dhcpd
+systemctl stop dhcpd
+systemctl disable tftp
+systemctl stop tftp

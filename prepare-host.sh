@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Run this to prepare the host/hypervisor that will run all cluster VMs 
+
 # Ensure the script is run as root
 if [[ ${EUID} -ne 0 ]]; then
   echo "This script must be run as root. Exiting."

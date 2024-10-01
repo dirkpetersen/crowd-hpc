@@ -14,3 +14,11 @@
 ## other tools 
 
 - https://docs.openstack.org/virtualbmc/latest/user/index.html (packages: virtualbmc or python3-virtualbmc)
+
+## RPM/DEB packages 
+
+- https://github.com/nebius/slurm-deb-packages
+- 
+
+
+

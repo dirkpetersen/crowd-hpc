@@ -1,4 +1,10 @@
 #cloud-config
+
+hostname: control-node
+fqdn: control-node.cluster1
+manage_etc_hosts: true
+ssh_pwauth: True
+
 # Enable console output over serial
 output:
   all: "| tee -a /var/log/cloud-init-output.log"
@@ -28,6 +34,3 @@ chpasswd:
   list: |
     rocky:rocky
   expire: False
-
-# Enable password authentication for SSH
-#ssh_pwauth: True

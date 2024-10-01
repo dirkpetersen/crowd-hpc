@@ -3,15 +3,15 @@ Evaluation of a collaborative HPC/AI stack in a KVM testbed
 
 ## Prepare host machine (hypervisor) and user account
 
-* first get a (virtual) machine with at least 8GB memory and a good amount of disk space under /home
+* first get a (virtual) machine with at least 8GB memory and a good amount of disk space under /home (last tested with Ubuntu 24.04 and RHEL/Rocky 9.4)
 
-* Run this script as sudo/root user to install packages and configure networking
+* Run the [prepare-host.sh](https://raw.githubusercontent.com/dirkpetersen/crowd-hpc/refs/heads/main/prepare-host.sh) script as sudo/root user to install packages and configure networking
 
 ```
 curl https://raw.githubusercontent.com/dirkpetersen/crowd-hpc/refs/heads/main/prepare-host.sh?token=$(date +%s) | sudo bash
 ```
 
-* Run this script as sudo/root  to create a new system user with the right permissions to create VMs (chpc in this case)
+* Run the [prepare-user.sh](https://raw.githubusercontent.com/dirkpetersen/crowd-hpc/refs/heads/main/prepare-user.sh) script as sudo/root to create a new system user with the right permissions to create VMs (`chpc` in this case)
 
 ```
 curl -s https://raw.githubusercontent.com/dirkpetersen/crowd-hpc/refs/heads/main/prepare-user.sh?token=$(date +%s) | sudo bash -s -- chpc

@@ -13,9 +13,9 @@ output:
 bootcmd:
   - sed -i '/^GRUB_CMDLINE_LINUX=/ s/"$/ console=ttyS0,115200n8"/' /etc/default/grub
   - grub2-mkconfig -o /boot/grub2/grub.cfg
-  - mkdir -p /etc/systemd/system/NetworkManager-wait-online.service.d/
-  - echo -e "[Service]\nExecStart=/usr/lib/systemd/systemd-networkd-wait-online --any" > /etc/systemd/system/NetworkManager-wait-online.service.d/override.conf
-  - systemctl daemon-reload
+  - mkdir -p /etc/systemd/system//NetworkManager-wait-online.service.d
+  - echo -e "[Service]\nExecStart=/usr/bin/nm-online -s -q -t 3" > /etc/systemd/system//NetworkManager-wait-online.service.d/override.conf
+  - systemctl daemon-reload && systemctl restart systemd-networkd-wait-online
 
 # Ensure the cloud-init log is visible via the console and services are started after boot
 runcmd:
@@ -25,6 +25,12 @@ runcmd:
   - systemctl start serial-getty@ttyS0.service
   - echo "cloud-init has finished configuring the instance" > /dev/ttyS0
   - cd /root && git clone https://github.com/dirkpetersen/crowd-hpc && cd crowd-hpc && ./warewulf/install-warewulf.sh &
+
+write_files:
+  - path: /root/crowd-hpc/.env
+    content: |
+      VAR1=value1
+      VAR2=value2
 
 packages:
   - acpid

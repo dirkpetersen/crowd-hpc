@@ -1,5 +1,5 @@
 # crowd-hpc
-Evaluation of a collaborative HPC/AI stack in a KVM testbed 
+Evaluation of a collaborative HPC/AI stack in a KVM Sandbox. The Sandbox uses Warewulf4 to deploy a fully functional Slurm cluster, possibly with 4 networks (default, pxe, ipmi, storage)
 
 ## Prepare host machine (hypervisor) and user account
 

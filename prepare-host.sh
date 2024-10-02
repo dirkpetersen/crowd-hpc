@@ -27,9 +27,9 @@ function detect_os {
 # Install packages based on OS type
 function install_packages {
   echo "Installing necessary packages for ${OS_TYPE}..."
-  if [[ ${OS_TYPE} == "ubuntu" ]]; then
+  if [[ ${OS_TYPE} == "ubuntu" || ${OS_TYPE} == "debian" ]]; then
     apt update && DEBIAN_FRONTEND=noninteractive apt install -y ${DEBIAN_PKG}
-  elif [[ ${OS_TYPE} == "rhel" || ${OS_TYPE} == "centos" || ${OS_TYPE} == "fedora" ]]; then
+  elif [[ " rhel centos fedora rocky alma " =~ " ${OS_TYPE} " ]]; then
     dnf install -y ${REDHAT_PKG}
   else
     echo "Unsupported OS. Exiting."

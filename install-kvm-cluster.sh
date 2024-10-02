@@ -116,12 +116,15 @@ create_worker_nodes() {
   done
 }
 
+
 # Main function to create environment and start VMs
 create_environment() {
   check_kvm_and_nested
   check_and_download_image
   create_control_node
   create_worker_nodes
+  #cnip=$(jq -r '.[] | select(.hostname=="control-node") | .["ip-address"]' /var/lib/libvirt/dnsmasq/virbr0.status)
+  #OR ssh rocky@${cnip}
   echo "Run: virsh console control-node"
 }
 

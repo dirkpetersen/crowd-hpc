@@ -35,7 +35,7 @@ create_or_modify_user() {
   if [[ "${OS_NAME}" == "ubuntu" || "${OS_NAME}" == "debian" ]]; then
     echo "Adding user ${NEWUSER} to libvirt and kvm groups on Debian/Ubuntu..."
     usermod -aG libvirt,kvm ${NEWUSER}
-  elif [[ "${OS_NAME}" == "rhel" || "${OS_NAME}" == "centos" || "${OS_NAME}" == "fedora" ]]; then
+  elif [[ " rhel centos fedora rocky alma " =~ " ${OS_NAME} " ]]; then 
     echo "Adding user ${NEWUSER} to libvirtd and kvm groups on Redhat..."
     usermod -aG libvirtd,kvm ${NEWUSER}
   else

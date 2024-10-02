@@ -17,7 +17,7 @@ NETWORK_BRIDGES="${NETWORK_BRIDGES:-default:virbr0 pxe:virbr1 ipmi:virbr2 storag
 function detect_os {
   if [[ -f /etc/os-release ]]; then
     source /etc/os-release
-    OS_TYPE=${ID}
+    OS_NAME=${ID}
   else
     echo "Unsupported OS. Exiting."
     exit 1
@@ -26,10 +26,10 @@ function detect_os {
 
 # Install packages based on OS type
 function install_packages {
-  echo "Installing necessary packages for ${OS_TYPE}..."
-  if [[ ${OS_TYPE} == "ubuntu" || ${OS_TYPE} == "debian" ]]; then
+  echo "Installing necessary packages for ${OS_NAME}..."
+  if [[ ${OS_NAME} == "ubuntu" || ${OS_NAME} == "debian" ]]; then
     apt update && DEBIAN_FRONTEND=noninteractive apt install -y ${DEBIAN_PKG}
-  elif [[ " rhel centos fedora rocky alma " =~ " ${OS_TYPE} " ]]; then
+  elif [[ " rhel centos fedora rocky alma " =~ " ${OS_NAME} " ]]; then
     dnf install -y ${REDHAT_PKG}
   else
     echo "Unsupported OS. Exiting."

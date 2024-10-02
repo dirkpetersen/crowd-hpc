@@ -12,6 +12,7 @@ fi
 DEBIAN_PKG="${DEBIAN_PKG:-qemu-system-x86 libvirt-daemon-system libvirt-clients bridge-utils virtinst virtualbmc}"
 REDHAT_PKG="${REDHAT_PKG:-qemu-kvm libvirt virt-install bridge-utils}"
 NETWORK_BRIDGES="${NETWORK_BRIDGES:-default:virbr0 pxe:virbr1 ipmi:virbr2 storage:virbr3}"
+QEMU_HELPER="qemu-bridge-helper"
 
 # Detect the OS type
 function detect_os {
@@ -29,8 +30,10 @@ function install_packages {
   echo "Installing necessary packages for ${OS_NAME}..."
   if [[ ${OS_NAME} == "ubuntu" || ${OS_NAME} == "debian" ]]; then
     apt update && DEBIAN_FRONTEND=noninteractive apt install -y ${DEBIAN_PKG}
+    QEMU_HELPER="/usr/lib/qemu/qemu-bridge-helper"
   elif [[ " rhel centos fedora rocky alma " =~ " ${OS_NAME} " ]]; then
     dnf install -y ${REDHAT_PKG}
+    QEMU_HELPER="/usr/libexec/qemu-bridge-helper"
   else
     echo "Unsupported OS. Exiting."
     exit 1
@@ -134,8 +137,8 @@ function configure_qemu_bridge_helper {
   echo "/etc/qemu/bridge.conf has been configured."
 
   # Set setuid on qemu-bridge-helper
-  echo "Setting setuid on /usr/lib/qemu/qemu-bridge-helper..."  
-  chmod u+s /usr/lib/qemu/qemu-bridge-helper
+  echo "Setting setuid on ${QEMU_HELPER} ..."  
+  chmod u+s ${QEMU_HELPER}
 
 }
 

@@ -10,7 +10,7 @@ fi
 
 # Constants which can be overwritten by environment vars
 DEBIAN_PKG="${DEBIAN_PKG:-qemu-system-x86 libvirt-daemon-system libvirt-clients bridge-utils virtinst virtualbmc}"
-REDHAT_PKG="${REDHAT_PKG:-qemu-kvm libvirt virt-install bridge-utils}"
+REDHAT_PKG="${REDHAT_PKG:-qemu-kvm libvirt virt-install bridge-utils python3-pip}"
 NETWORK_BRIDGES="${NETWORK_BRIDGES:-default:virbr0 pxe:virbr1 ipmi:virbr2 storage:virbr3}"
 QEMU_HELPER="qemu-bridge-helper"
 

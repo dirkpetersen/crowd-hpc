@@ -45,6 +45,7 @@ create_or_modify_user() {
 
   echo "Configure environment for ${NEWUSER} ..."
   su - ${NEWUSER} -c "bash -c '
+    python3 -m pip install virtualbmc
     echo \"export DBUS_SESSION_BUS_ADDRESS=\${DBUS_SESSION_BUS_ADDRESS:-unix:path=/run/user/\$(id -u)/bus}\" >> ~/.bashrc
     echo \"export XDG_RUNTIME_DIR=\${XDG_RUNTIME_DIR:-/run/user/\$(id -u)}\" >> ~/.bashrc
     echo \"alias virsh=\\\"virsh --connect qemu:///session\\\"\" >> ~/.bashrc

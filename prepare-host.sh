@@ -47,7 +47,8 @@ install_packages() {
   fi
   if [ -f "/usr/bin/dnf" ]; then
     install_command="dnf install -y"
-    install_output=$(sudo $install_command "${packages[@]}" 2>&1 | tee /dev/tty)
+    epeloutput=$($install_command "epel-release" 2>&1)
+    install_output=$($install_command "${packages[@]}" 2>&1 | tee /dev/tty)
     # Parse dnf output for failed packages (compatible with Amazon Linux)
     while IFS= read -r line; do
       if [[ $line == "No match for argument"* ]]; then
@@ -57,7 +58,7 @@ install_packages() {
   elif [ -f "/usr/bin/apt" ]; then
     sudo apt update
     install_command="DEBIAN_FRONTEND=noninteractive apt install -y"
-    install_output=$(sudo $install_command "${packages[@]}" 2>&1 | tee /dev/tty)
+    install_output=$($install_command "${packages[@]}" 2>&1 | tee /dev/tty)
     # Parse apt output for failed packages
     while IFS= read -r line; do
       if [[ $line == *"Unable to locate package"* ]]; then

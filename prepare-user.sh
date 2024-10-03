@@ -6,19 +6,21 @@
 NEWUSER=${1}  # The username to be created/tweaked
 SHELL_BIN="/bin/bash"
 
+if [[ $(id -u) -ne 0 ]]; then
+  echo "This script must be run as root. Exiting."
+  exit 1
+fi
+
 if [[ -z ${NEWUSER} ]]; then
   echo "Please enter a username as argument"
   exit 1 
 fi
 
-# Check if the script is running on Ubuntu or RHEL
-if [[ -f /etc/os-release ]]; then
-  . /etc/os-release
-  OS_NAME=${ID}
-else
-  echo "Unsupported operating system"
-  exit 1
-fi
+# Load support functions from the same directory as the script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/support-functions.sh"
+
+OS_FAMILY=$(check_os_family)
 
 # Function to create or modify the user
 create_or_modify_user() {
@@ -32,20 +34,19 @@ create_or_modify_user() {
   echo "Enabling linger for ${NEWUSER}..."
   loginctl enable-linger ${NEWUSER}
 
-  if [[ "${OS_NAME}" == "ubuntu" || "${OS_NAME}" == "debian" ]]; then
-    echo "Adding user ${NEWUSER} to libvirt and kvm groups on Debian/Ubuntu..."
+  if [[ "${OS_FAMILY}" == "debian" ]]; then
+    echo "Adding user ${NEWUSER} to libvirt and kvm groups on Debian/Ubuntu type OS..."
     usermod -aG libvirt,kvm ${NEWUSER}
-  elif [[ " rhel centos fedora rocky alma " =~ " ${OS_NAME} " ]]; then 
-    echo "Adding user ${NEWUSER} to libvirtd and kvm groups on Redhat..."
+  elif [[ "${OS_FAMILY}" == "redhat" ]]; then 
+    echo "Adding user ${NEWUSER} to libvirtd and kvm groups on Redhat type OS..."
     usermod -aG libvirtd,kvm ${NEWUSER}
-  else
-    echo "Unsupported OS: ${OS_NAME}"
-    exit 1
   fi
 
   echo "Configure environment for ${NEWUSER} ..."
   su - ${NEWUSER} -c "bash -c '
-    python3 -m pip install virtualbmc
+    if [[ "'${OS_FAMILY}'" == "redhat" ]]; then 
+      python3 -m pip install virtualbmc
+    fi
     echo \"export DBUS_SESSION_BUS_ADDRESS=\${DBUS_SESSION_BUS_ADDRESS:-unix:path=/run/user/\$(id -u)/bus}\" >> ~/.bashrc
     echo \"export XDG_RUNTIME_DIR=\${XDG_RUNTIME_DIR:-/run/user/\$(id -u)}\" >> ~/.bashrc
     echo \"alias virsh=\\\"virsh --connect qemu:///session\\\"\" >> ~/.bashrc

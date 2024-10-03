@@ -3,7 +3,7 @@
 # Run this to prepare the host/hypervisor that will run all cluster VMs 
 
 # Ensure the script is run as root
-if [[ ${EUID} -ne 0 ]]; then
+if [[ $(id -u) -ne 0 ]]; then
   echo "This script must be run as root. Exiting."
   exit 1
 fi
@@ -14,29 +14,22 @@ REDHAT_PKG="${REDHAT_PKG:-qemu-kvm libvirt virt-install bridge-utils python3-pip
 NETWORK_BRIDGES="${NETWORK_BRIDGES:-default:virbr0 pxe:virbr1 ipmi:virbr2 storage:virbr3}"
 QEMU_HELPER="qemu-bridge-helper"
 
-# Detect the OS type
-function detect_os {
-  if [[ -f /etc/os-release ]]; then
-    source /etc/os-release
-    OS_NAME=${ID}
-  else
-    echo "Unsupported OS. Exiting."
-    exit 1
-  fi
-}
+# Load support functions from the same directory as the script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/support-functions.sh"
+
+OS_FAMILY=$(check_os_family)
+
 
 # Install packages based on OS type
 function install_packages {
-  echo "Installing necessary packages for ${OS_NAME}..."
-  if [[ ${OS_NAME} == "ubuntu" || ${OS_NAME} == "debian" ]]; then
+  if [[ "${OS_FAMILY}" == "debian" ]]; then
     apt update && DEBIAN_FRONTEND=noninteractive apt install -y ${DEBIAN_PKG}
     QEMU_HELPER="/usr/lib/qemu/qemu-bridge-helper"
-  elif [[ " rhel centos fedora rocky alma " =~ " ${OS_NAME} " ]]; then
+
+  elif [[ "${OS_FAMILY}" == "redhat" ]]; then 
     dnf install -y ${REDHAT_PKG}
     QEMU_HELPER="/usr/libexec/qemu-bridge-helper"
-  else
-    echo "Unsupported OS. Exiting."
-    exit 1
   fi
 }
 
@@ -170,6 +163,7 @@ function main {
   manage_libvirtd
   setup_network_bridges
   configure_qemu_bridge_helper
+  manage_libvirtd
   echo "Setup completed successfully."
   virsh net-list
 }

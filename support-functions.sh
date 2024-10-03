@@ -2,6 +2,25 @@
 
 # functions that are sourced by other scripts. 
 
+check_os_family() {
+  # Check if we are running on Redhat or Debian family
+  local OS_FAMILY
+  if ! [[ -f /etc/os-release ]]; then
+    echo "Unsupported operating system" >&2
+    exit 1
+  fi
+  . /etc/os-release
+  if [[ " ${ID_LIKE} " =~ " fedora " ]]; then
+    OS_FAMILY="redhat" # rhel centos fedora rocky alma
+  elif [[ " ${ID_LIKE} " =~ " debian " ]]; then
+    OS_FAMILY="debian" # ubuntu debian
+  else
+    echo "Unsupported operating system: ${ID}" >&2
+    exit 1
+  fi
+  echo ${OS_FAMILY}
+}
+
 # Function to detect if running on KVM and check for nested virtualization support
 check_kvm_and_nested() {
   if [[ ! -d /sys/module/kvm ]]; then

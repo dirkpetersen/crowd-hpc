@@ -36,7 +36,8 @@ create_control_node() {
     DISK_OPTS="$HOME/kvm-images/${CONTROL_VM}.qcow2"
     BOOT_OPTS="-cdrom ${LOCAL_IMAGE_PATH}"
   else
-    DISK_OPTS="${LOCAL_IMAGE_PATH}"
+    #DISK_OPTS="${LOCAL_IMAGE_PATH}"
+    DISK_OPTS="$HOME/kvm-images/${CONTROL_VM}.qcow2"
     BOOT_OPTS="-drive file=${DISK_OPTS},format=qcow2"
   fi
 

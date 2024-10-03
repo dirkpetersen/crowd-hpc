@@ -1,9 +1,9 @@
 # crowd-hpc
-Evaluation of a collaborative HPC/AI stack in a KVM Sandbox. The Sandbox uses Warewulf4 to deploy a fully functional Slurm cluster, possibly with 4 networks (default, pxe, ipmi, storage)
+Evaluation of a collaborative HPC/AI stack in a KVM Sandbox. The Sandbox uses Warewulf4 to deploy a fully functional Slurm cluster, possibly with 4 networks (default, pxe, ipmi, storage). While the Warewulf 4 virtual machine uses the latest `Rocky Linux`, the cluster nodes can use `Debian` images/containers such as `Ubuntu` and `Nvidia DGX OS` or and other Redhat like distribution.
 
 ## Prepare host machine (hypervisor) and user account
 
-* first get a (virtual) machine with at least 8GB memory and a good amount of disk space under /home (last tested with Ubuntu 24.04 and RHEL/Rocky 9.4)
+* first get a (virtual) machine with at least 8GB memory and a good amount of disk space under /home (successfully tested with Ubuntu 24.04, RHEL/Rocky 9.4 does current not work, see `Troubleshooting` section below)
 
 * Run the [prepare-host.sh](https://raw.githubusercontent.com/dirkpetersen/crowd-hpc/refs/heads/main/prepare-host.sh) script as sudo/root user to install packages and configure networking
 
@@ -11,10 +11,32 @@ Evaluation of a collaborative HPC/AI stack in a KVM Sandbox. The Sandbox uses Wa
 curl https://raw.githubusercontent.com/dirkpetersen/crowd-hpc/refs/heads/main/prepare-host.sh?token=$(date +%s) | sudo bash
 ```
 
+when this is done, you should see this: 
+
+```
+Setup completed successfully.
+ Name      State    Autostart   Persistent
+--------------------------------------------
+ default   active   yes         yes
+ ipmi      active   yes         yes
+ pxe       active   yes         yes
+ storage   active   yes         yes
+```
+
 * Run the [prepare-user.sh](https://raw.githubusercontent.com/dirkpetersen/crowd-hpc/refs/heads/main/prepare-user.sh) script as sudo/root to create a new system user with the right permissions to create VMs (`chpc` in this case)
 
 ```
 curl -s https://raw.githubusercontent.com/dirkpetersen/crowd-hpc/refs/heads/main/prepare-user.sh?token=$(date +%s) | sudo bash -s -- chpc
+```
+
+when this is done, you should see this: 
+
+```
+Creating user chpc...
+Enabling linger for chpc...
+Configure environment for chpc ...
+
+Enter: sudo su - chpc
 ```
 
 **from now on we run every command as user, e.g. chpc**
@@ -72,4 +94,19 @@ if there are no error messages you should be able see this list of nodes
  4    worker-node-3   running
 ```
 
-## deploy KVM cluster 
+## Troubleshooting 
+
+if we run ./install-kvm-cluster.sh on Rocky 9.4 we are getting this error: 
+
+```
+Creating control node: control-node
+Starting control node with virt-install...
+ERROR    /usr/libexec/qemu-bridge-helper --use-vnet --br=virbr1 --fd=30: failed to communicate with bridge helper: stderr=access denied by acl file
+: Transport endpoint is not connected
+Domain installation does not appear to have been successful.
+```
+
+Tried :
+
+- `sudo setenforce 0`  # disabled SELinux
+- `filecap /usr/libexec/qemu-bridge-helper net_admin` as suggested here: https://bugs.gentoo.org/677152

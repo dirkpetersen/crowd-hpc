@@ -56,9 +56,8 @@ install_packages() {
       fi
     done <<< "$install_output"
   elif [ -f "/usr/bin/apt" ]; then
-    sudo apt update
-    install_command="DEBIAN_FRONTEND=noninteractive apt install -y"
-    install_output=$($install_command "${packages[@]}" 2>&1 | tee /dev/tty)
+    apt update
+    install_output=$(DEBIAN_FRONTEND=noninteractive apt install -y "${packages[@]}" 2>&1 | tee /dev/tty)
     # Parse apt output for failed packages
     while IFS= read -r line; do
       if [[ $line == *"Unable to locate package"* ]]; then

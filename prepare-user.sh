@@ -16,11 +16,24 @@ if [[ -z ${NEWUSER} ]]; then
   exit 1 
 fi
 
-# Load support functions from the same directory as the script
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "${SCRIPT_DIR}/support-functions.sh"
-
-OS_FAMILY=$(check_os_family)
+# Function to detect if we are running on Redhat or Debian family
+check_os_family() {
+  local OS_FAMILY
+  if ! [[ -f /etc/os-release ]]; then
+    echo "Unsupported operating system" >&2
+    exit 1
+  fi
+  . /etc/os-release
+  if [[ " ${ID_LIKE} " =~ " fedora " ]]; then
+    OS_FAMILY="redhat" # rhel centos fedora rocky alma
+  elif [[ " ${ID_LIKE} " =~ " debian " ]]; then
+    OS_FAMILY="debian" # ubuntu debian
+  else
+    echo "Unsupported operating system: ${ID}" >&2
+    exit 1
+  fi
+  echo ${OS_FAMILY}
+}
 
 # Function to create or modify the user
 create_or_modify_user() {
@@ -56,4 +69,5 @@ create_or_modify_user() {
 }
 
 # Main execution
+OS_FAMILY=$(check_os_family)
 create_or_modify_user

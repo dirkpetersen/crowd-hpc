@@ -14,12 +14,24 @@ REDHAT_PKG="${REDHAT_PKG:-qemu-kvm libvirt virt-install bridge-utils python3-pip
 NETWORK_BRIDGES="${NETWORK_BRIDGES:-default:virbr0 pxe:virbr1 ipmi:virbr2 storage:virbr3}"
 QEMU_HELPER="qemu-bridge-helper"
 
-# Load support functions from the same directory as the script
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "${SCRIPT_DIR}/support-functions.sh"
-
-OS_FAMILY=$(check_os_family)
-
+# Function to detect if we are running on Redhat or Debian family
+check_os_family() {
+  local OS_FAMILY
+  if ! [[ -f /etc/os-release ]]; then
+    echo "Unsupported operating system" >&2
+    exit 1
+  fi
+  . /etc/os-release
+  if [[ " ${ID_LIKE} " =~ " fedora " ]]; then
+    OS_FAMILY="redhat" # rhel centos fedora rocky alma
+  elif [[ " ${ID_LIKE} " =~ " debian " ]]; then
+    OS_FAMILY="debian" # ubuntu debian
+  else
+    echo "Unsupported operating system: ${ID}" >&2
+    exit 1
+  fi
+  echo ${OS_FAMILY}
+}
 
 # Install packages based on OS type
 function install_packages {
@@ -158,7 +170,7 @@ function setup_network_bridges {
 
 # Main function to execute all steps
 function main {
-  detect_os
+  OS_FAMILY=$(check_os_family)
   install_packages
   manage_libvirtd
   setup_network_bridges

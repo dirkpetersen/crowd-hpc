@@ -2,8 +2,8 @@
 
 # functions that are sourced by other scripts. 
 
+# Function to detect if we are running on Redhat or Debian family
 check_os_family() {
-  # Check if we are running on Redhat or Debian family
   local OS_FAMILY
   if ! [[ -f /etc/os-release ]]; then
     echo "Unsupported operating system" >&2

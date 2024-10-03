@@ -11,7 +11,8 @@ CONTROL_CPU=2             # 2 CPUs
 CONTROL_DISK_SIZE=20480   # 20GB Disk in MB
 CONTROL_IMAGE_URL="https://download.rockylinux.org/pub/rocky/9.4/images/x86_64/Rocky-9-GenericCloud-LVM.latest.x86_64.qcow2"
 TMP_IMAGE_PATH="/tmp/$(basename ${CONTROL_IMAGE_URL})"
-LOCAL_IMAGE_PATH="$HOME/kvm-images/$(basename ${CONTROL_IMAGE_URL})"
+#LOCAL_IMAGE_PATH="$HOME/kvm-images/$(basename ${CONTROL_IMAGE_URL})"
+LOCAL_IMAGE_PATH="$HOME/kvm-images/${CONTROL_VM}.qcow2"
 
 # Constants for Worker nodes configuration
 WORKER_COUNT=3
@@ -116,7 +117,6 @@ create_worker_nodes() {
     fi
   done
 }
-
 
 # Main function to create environment and start VMs
 create_environment() {

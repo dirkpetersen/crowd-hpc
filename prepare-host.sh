@@ -175,7 +175,6 @@ function main {
   manage_libvirtd
   setup_network_bridges
   configure_qemu_bridge_helper
-  manage_libvirtd
   echo "Setup completed successfully."
   virsh net-list
 }

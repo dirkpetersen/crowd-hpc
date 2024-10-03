@@ -10,7 +10,7 @@ fi
 
 # Constants which can be overwritten by environment vars
 DEBIAN_PKG="${DEBIAN_PKG:-qemu-system-x86 libvirt-daemon-system libvirt-clients bridge-utils virtinst virtualbmc}"
-REDHAT_PKG="${REDHAT_PKG:-qemu-kvm libvirt virt-install bridge-utils python3-pip}"
+REDHAT_PKG="${REDHAT_PKG:-qemu-kvm libvirt virt-install bridge-utils python3-pip libcap-ng-utils}"
 NETWORK_BRIDGES="${NETWORK_BRIDGES:-default:virbr0 pxe:virbr1 ipmi:virbr2 storage:virbr3}"
 QEMU_HELPER="qemu-bridge-helper"
 
@@ -140,6 +140,9 @@ function configure_qemu_bridge_helper {
   chmod 644 /etc/qemu/bridge.conf
 
   echo "/etc/qemu/bridge.conf has been configured."
+
+  # is this needed ? https://bugs.gentoo.org/677152 (filecap in libcap-ng-utils)
+  #filecap ${QEMU_HELPER} net_admin
 
   # Set setuid on qemu-bridge-helper
   echo "Setting setuid on ${QEMU_HELPER} ..."  

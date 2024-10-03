@@ -46,14 +46,7 @@ create_or_modify_user() {
 
   echo "Enabling linger for ${NEWUSER}..."
   loginctl enable-linger ${NEWUSER}
-
-  if [[ "${OS_FAMILY}" == "debian" ]]; then
-    echo "Adding user ${NEWUSER} to libvirt and kvm groups on Debian/Ubuntu type OS..."
-    usermod -aG libvirt,kvm ${NEWUSER}
-  elif [[ "${OS_FAMILY}" == "redhat" ]]; then 
-    echo "Adding user ${NEWUSER} to libvirtd and kvm groups on Redhat type OS..."
-    usermod -aG libvirtd,kvm ${NEWUSER}
-  fi
+  usermod -aG libvirt,kvm ${NEWUSER}
 
   echo "Configure environment for ${NEWUSER} ..."
   su - ${NEWUSER} -c "bash -c '

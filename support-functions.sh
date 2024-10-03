@@ -24,8 +24,8 @@ check_os_family() {
 # Function to detect if running on KVM and check for nested virtualization support
 check_kvm_and_nested() {
   if [[ ! -d /sys/module/kvm ]]; then
-    echo "This system does not support KVM. Exiting."
-    exit 1
+    echo "This system is not a KVM guest. Skipping"
+    return 0
   fi
 
   # Check for nested virtualization support

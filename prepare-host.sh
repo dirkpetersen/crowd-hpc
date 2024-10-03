@@ -8,40 +8,72 @@ if [[ $(id -u) -ne 0 ]]; then
   exit 1
 fi
 
+if command -v docker &>/dev/null; then
+  echo "Docker appears to be installed, please remove docker from this machine as it's network might interfere with KVM"
+  exit 1
+fi
+
 # Constants which can be overwritten by environment vars
 DEBIAN_PKG="${DEBIAN_PKG:-qemu-system-x86 libvirt-daemon-system libvirt-clients bridge-utils virtinst virtualbmc}"
 REDHAT_PKG="${REDHAT_PKG:-qemu-kvm libvirt virt-install bridge-utils python3-pip libcap-ng-utils}"
 NETWORK_BRIDGES="${NETWORK_BRIDGES:-default:virbr0 pxe:virbr1 ipmi:virbr2 storage:virbr3}"
-QEMU_HELPER="qemu-bridge-helper"
 
-# Function to detect if we are running on Redhat or Debian family
-check_os_family() {
-  local OS_FAMILY
-  if ! [[ -f /etc/os-release ]]; then
-    echo "Unsupported operating system" >&2
-    exit 1
-  fi
-  . /etc/os-release
-  if [[ " ${ID_LIKE} " =~ " fedora " ]]; then
-    OS_FAMILY="redhat" # rhel centos fedora rocky alma
-  elif [[ " ${ID_LIKE} " =~ " debian " ]]; then
-    OS_FAMILY="debian" # ubuntu debian
+install_packages() {
+  local packages=()
+  local failed_packages=()
+  local install_command
+  local install_output
+
+  # Process arguments or use default package lists
+  if [ $# -eq 0 ]; then
+    if [ -f "/usr/bin/dnf" ] && [ -n "${REDHAT_PKG}" ]; then
+      IFS=' ' read -ra packages <<< "${REDHAT_PKG}"
+    elif [ -f "/usr/bin/apt" ] && [ -n "${DEBIAN_PKG}" ]; then
+      IFS=' ' read -ra packages <<< "${DEBIAN_PKG}"
+    else
+      echo "No packages specified and no default package list available"
+      return 1
+    fi
   else
-    echo "Unsupported operating system: ${ID}" >&2
-    exit 1
+    for arg in "$@"; do
+      IFS=' ' read -ra pkg_list <<< "$arg"
+      packages+=("${pkg_list[@]}")
+    done
   fi
-  echo ${OS_FAMILY}
-}
-
-# Install packages based on OS type
-function install_packages {
-  if [[ "${OS_FAMILY}" == "debian" ]]; then
-    apt update && DEBIAN_FRONTEND=noninteractive apt install -y ${DEBIAN_PKG}
-    QEMU_HELPER="/usr/lib/qemu/qemu-bridge-helper"
-
-  elif [[ "${OS_FAMILY}" == "redhat" ]]; then 
-    dnf install -y ${REDHAT_PKG}
-    QEMU_HELPER="/usr/libexec/qemu-bridge-helper"
+  # Check if packages array is empty
+  if [ ${#packages[@]} -eq 0 ]; then
+    echo "No packages to install"
+    return 1
+  fi
+  if [ -f "/usr/bin/dnf" ]; then
+    install_command="dnf install -y"
+    install_output=$(sudo $install_command "${packages[@]}" 2>&1)
+    # Parse dnf output for failed packages (compatible with Amazon Linux)
+    while IFS= read -r line; do
+      if [[ $line == "No match for argument"* ]]; then
+        failed_packages+=($(echo $line | awk '{print $NF}'))
+      fi
+    done <<< "$install_output"
+  elif [ -f "/usr/bin/apt" ]; then
+    sudo apt update
+    install_command="DEBIAN_FRONTEND=noninteractive apt install -y"
+    install_output=$(sudo $install_command "${packages[@]}" 2>&1)
+    # Parse apt output for failed packages
+    while IFS= read -r line; do
+      if [[ $line == *"Unable to locate package"* ]]; then
+        failed_packages+=($(echo $line | awk '{print $NF}'))
+      fi
+    done <<< "$install_output"
+  else
+    echo "Error: Neither /usr/bin/dnf nor /usr/bin/apt found"
+    return 1
+  fi
+  if [ ${#failed_packages[@]} -eq 0 ]; then
+    echo "All packages were installed successfully"
+    return 0
+  else
+    echo "The following packages failed to install: ${failed_packages[*]}"
+    return 1
   fi
 }
 
@@ -142,12 +174,19 @@ function configure_qemu_bridge_helper {
   echo "/etc/qemu/bridge.conf has been configured."
 
   # is this needed ? https://bugs.gentoo.org/677152 (filecap in libcap-ng-utils)
-  #filecap ${QEMU_HELPER} net_admin
+  #filecap qemu-bridge-helper net_admin
 
   # Set setuid on qemu-bridge-helper
-  echo "Setting setuid on ${QEMU_HELPER} ..."  
-  chmod u+s ${QEMU_HELPER}
+  echo "Setting setuid on qemu-bridge-helper ..."  
 
+  if [[ -f "/usr/bin/dnf" ]]; then
+    chmod u+s "/usr/libexec/qemu-bridge-helper"
+  elif  [[ -f "/usr/bin/apt" ]]; then
+    chmod u+s "/usr/lib/qemu/qemu-bridge-helper"
+  else 
+    echo "Error: could not detect os, no qemu-bridge-helper configured"
+    return 1
+  fi 
 }
 
 # Setup the network bridges
@@ -173,8 +212,7 @@ function setup_network_bridges {
 
 # Main function to execute all steps
 function main {
-  OS_FAMILY=$(check_os_family)
-  install_packages
+  install_packages || exit 1
   manage_libvirtd
   setup_network_bridges
   configure_qemu_bridge_helper

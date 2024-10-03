@@ -89,7 +89,7 @@ function check_bridge_exists {
     if [[ -n ${existing_network} ]]; then
       echo "Bridge ${bridge} is currently associated with network '${existing_network}'."
       echo -e "To delete it, use the following commands:"
-      echo -e "${YELLOW}  virsh net-destroy ${existing_network} && virsh net-undefine ${existing_network}${NC}"
+      echo -e "${YELLOW}  sudo virsh net-destroy ${existing_network} && sudo virsh net-undefine ${existing_network}${NC}"
     else
       echo "No network is associated with this bridge."
     fi
